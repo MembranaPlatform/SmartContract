@@ -12,6 +12,7 @@ contract TokenMercatusPresale is IERC20 {
     string public constant name = "Mercatus Presale Token";
     uint8 public constant decimals = 18;
     uint256 public constant rate = 500; // 1 eth = 500 PreMcs
+    uint256 public constant minBuyinEther = 40; // Minimum buyin is 40 eth
     address public owner;
     
     // ============ Standard ERC20 token functionality =================
@@ -71,7 +72,7 @@ contract TokenMercatusPresale is IERC20 {
     // ============ Create and sell tokens =================
 
     function createTokens() whenNotPaused public payable {
-        require(msg.value > 0);
+        require(msg.value >= minBuyinEther);
         uint256 tokens = msg.value.mul(rate);
         balances[msg.sender] = balances[msg.sender].add(tokens);
         _totalSupply = _totalSupply.add(tokens);
