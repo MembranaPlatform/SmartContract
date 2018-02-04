@@ -23,7 +23,7 @@ contract MultiSigWallet {
      */
     uint constant public MAX_OWNER_COUNT = 50;
     uint constant public DURATION = 365*24*3600;
-    //uint constant public DURATION = 60; // for testing
+    //uint constant public DURATION = 5*60; // for testing
 
     /*
      *  Storage
@@ -34,7 +34,7 @@ contract MultiSigWallet {
     address[] public owners;
     uint public required;
     uint public transactionCount;
-    uint public deployTime;
+    uint public startTime = 0;
 
     struct Transaction {
         address destination;
@@ -99,8 +99,10 @@ contract MultiSigWallet {
         public
         payable
     {
-        if (msg.value > 0)
+        if (msg.value > 0) {
+            if (startTime == 0) startTime = now;
             Deposit(msg.sender, msg.value);
+        }
     }
 
     /*
@@ -119,7 +121,6 @@ contract MultiSigWallet {
         }
         owners = _owners;
         required = _required;
-        deployTime = now;
     }
 
     /// @dev Allows to add a new owner. Transaction has to be sent by wallet.
@@ -376,7 +377,7 @@ contract MultiSigWallet {
     function withdrawToInvestor()
         public
     {
-        require(now - deployTime >= DURATION);
+        require(now - startTime >= DURATION);
         owners[0].transfer(this.balance);
     }
     function getBalance()
